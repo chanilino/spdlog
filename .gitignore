@@ -33,4 +33,8 @@ example/*
 !example/makefile
 !example/makefile.clang
 
+# build directories
+build/
 
+#vim
+*.swp
