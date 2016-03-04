@@ -38,7 +38,7 @@ extern "C"
 		clog_write(&msg, c->logger, spdlog::level::info,  std, args);
 		va_end (args);
 		if(msg){
-	       	c->logger->info() << msg;
+	       		c->logger->info() << msg;
 			free(msg);
 		}
 	}
@@ -50,7 +50,7 @@ extern "C"
 		clog_write(&msg, c->logger, spdlog::level::info,  std, args);
 		va_end (args);
 		if(msg){
-	       	c->logger->debug() << msg;
+		       	c->logger->debug() << msg;
 			free(msg);
 		}
 	}
@@ -88,11 +88,15 @@ extern "C"
 	void cspd_set_pattern(const char* pattern){
 		spdlog::set_pattern(pattern);
 	}
+      	void c_logger_set_pattern(clogger * c, const char* pattern){
+		c->logger->set_pattern(pattern);	
+	}
 
 	clogger* cspd_rotating_logger_mt(const char* logger_name, const char* filename, 
 			size_t max_file_size, size_t max_files, bool force_flush ){
 		clogger * c =  (clogger*)calloc(1, sizeof(*c));
 		c->logger = spdlog::rotating_logger_mt(logger_name, filename, max_file_size, force_flush);
+		return c;
 	}
 
 
@@ -114,7 +118,8 @@ extern "C"
 
 	clogger* create_simple_file_logger_st(const char * name, const char* file, bool force_flush){
 		clogger * c =  (clogger*)calloc(1, sizeof(*c));
-		c->logger = spdlog::create<spd::sinks::simple_file_sink_st>(name, file, force_flush);
+		c->logger = spdlog::create<spdlog::sinks::simple_file_sink_st>(name, file, force_flush);
+		return c;
 	}
 	
 

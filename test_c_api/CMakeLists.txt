@@ -24,10 +24,16 @@
 cmake_minimum_required(VERSION 3.0)
 project(CSpdlogAPITests)
 
+set(CMAKE_C_FLAGS "-Wall -O3 -pthread")
+
+set(CMAKE_CXX_FLAGS "--std=c++11 ${CMAKE_C_FLAGS}")  
+
 add_executable(tests testcspdlog.c)
+add_executable(cspdlog-bench spdlog-bench.c)
 include_directories( "./c_api" )
 add_subdirectory( "./c_api" )
 #find_library(CSPDLOG NAMES cspdlog PATH "c_api/build" )
 
 target_link_libraries(tests  cspdlog)
+target_link_libraries(cspdlog-bench  cspdlog)
 #file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/logs")
