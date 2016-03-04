@@ -7,6 +7,6 @@ int main(void){
         cspd_set_pattern("*** [%H:%M:%S %z] [thread %t] %v ***");
         for (i = 0; i < 10; ++i)
 		clog_info(sout, "Hola %s: %d", "WORLD", i);
-        cspdlog_drop_all();
+        cspd_drop_all();
 	return 0;
 }

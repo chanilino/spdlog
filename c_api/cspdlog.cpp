@@ -12,7 +12,8 @@ struct _clogger{
 };
 extern "C"
 {
-	static inline void clog_write(char **msg, std::shared_ptr<spdlog::logger> logger, spdlog::level::level_enum level,  const char* std, va_list args){
+	static inline void clog_write(char **msg, std::shared_ptr<spdlog::logger> logger, 
+			spdlog::level::level_enum level,  const char* std, va_list args){
 		*msg = NULL;
 		if(!logger->should_log(level)){
 			return;
@@ -37,7 +38,7 @@ extern "C"
 		clog_write(&msg, c->logger, spdlog::level::info,  std, args);
 		va_end (args);
 		if(msg){
-	        	c->logger->info() << msg;
+	       	c->logger->info() << msg;
 			free(msg);
 		}
 	}
@@ -49,42 +50,75 @@ extern "C"
 		clog_write(&msg, c->logger, spdlog::level::info,  std, args);
 		va_end (args);
 		if(msg){
-	        	c->logger->debug() << msg;
+	       	c->logger->debug() << msg;
 			free(msg);
 		}
 	}
 
-	void cspd_set_level(clevel_enum level){
-		assert(TRACE == (clevel_enum)spdlog::level::trace);
-		assert(DEBUG == (clevel_enum)spdlog::level::debug);
-		assert(INFO == (clevel_enum)spdlog::level::info);
-		assert(NOTICE == (clevel_enum)spdlog::level::notice);
-		assert(WARN == (clevel_enum)spdlog::level::warn);
-		assert(ERR == (clevel_enum)spdlog::level::err);
-		assert(CRITICAL ==(clevel_enum)spdlog::level::critical);
-		assert(ALERT == (clevel_enum)spdlog::level::alert);
-		assert(EMERG == (clevel_enum)spdlog::level::emerg);
-		assert(OFF == (clevel_enum)spdlog::level::off);
-		spdlog::set_level((spdlog::level::level_enum)level);
+	bool cspd_set_level(clevel_enum level){
+		spdlog::level::level_enum  level_spd = spdlog::level::off;
+		switch(level){
+			case TRACE : level_spd = spdlog::level::trace;
+						 break;
+			case DEBUG : level_spd = spdlog::level::debug;
+						 break;
+			case INFO : level_spd = spdlog::level::info;
+						break;
+			case NOTICE : level_spd = spdlog::level::notice;
+						  break;
+			case WARN : level_spd = spdlog::level::warn;
+						break;
+			case ERR : level_spd = spdlog::level::err;
+					   break;
+			case CRITICAL :level_spd = spdlog::level::critical;
+						   break;
+			case ALERT : level_spd = spdlog::level::alert;
+						 break;
+			case EMERG : level_spd = spdlog::level::emerg;
+						 break;
+			case OFF : level_spd = spdlog::level::off;
+					   break;
+
+			default:
+				 return false;
+		}
+		spdlog::set_level(level_spd);
+		return true;
 	}
 	void cspd_set_pattern(const char* pattern){
 		spdlog::set_pattern(pattern);
 	}
 
-	clogger* cspd_rotating_logger_mt(const char* logger_name, const char* filename, size_t max_file_size, size_t max_files, bool force_flush ){
-		throw  std::logic_error("Not implemented");
+	clogger* cspd_rotating_logger_mt(const char* logger_name, const char* filename, 
+			size_t max_file_size, size_t max_files, bool force_flush ){
+		clogger * c =  (clogger*)calloc(1, sizeof(*c));
+		c->logger = spdlog::rotating_logger_mt(logger_name, filename, max_file_size, force_flush);
 	}
 
 
-	void cspd_set_async_mode(size_t queue_size, const casync_overflow_policy overflow_policy){
-		throw  std::logic_error("Not implemented");
+	bool cspd_set_async_mode(size_t queue_size, const casync_overflow_policy overflow_policy){
+		spdlog::async_overflow_policy async_policy;
+		switch(overflow_policy){
+			case BLOCK_RETRY: 
+				async_policy = spdlog::async_overflow_policy::block_retry;
+				 break;
+			case DISCARD_LOG_MSG: 
+				 async_policy =  spdlog::async_overflow_policy::discard_log_msg;
+				 break;
+			default:
+				 return false;
+		}
+        spdlog::set_async_mode(queue_size, async_policy );
+		return true;
 	}
 
-	void cspdlog_set_async_mode(size_t q_size){
-		throw  std::logic_error("Not implemented");
+	clogger* create_simple_file_logger_st(const char * name, const char* file, bool force_flush){
+		clogger * c =  (clogger*)calloc(1, sizeof(*c));
+		c->logger = spdlog::create<spd::sinks::simple_file_sink_st>(name, file, force_flush);
 	}
+	
 
-	void cspdlog_drop_all(void){
+	void cspd_drop_all(void){
 		//TODO: think about how to free memory allocated in create
         	spdlog::drop_all();
 	}

@@ -30,14 +30,14 @@ extern "C" {
 #endif
 	
 	clogger* create_stdout_logger_mt(const char * name);
+	clogger* create_simple_file_logger_st(const char * name, const char* file, bool force_flush);
+	clogger* cspd_rotating_logger_mt(const char* logger_name, const char* filename, size_t max_file_size, size_t max_files, bool force_flush );
 	void clog_info(clogger* c, const char * std, ... );
 	void clog_debug(clogger* c, const char * std, ... );
-	void cspd_set_level(clevel_enum level);
-	clogger* cspd_rotating_logger_mt(const char* logger_name, const char* filename, size_t max_file_size, size_t max_files, bool force_flush );
+	bool cspd_set_level(clevel_enum level);
       	void cspd_set_pattern(const char* pattern);
-	void cspd_set_async_mode(size_t queue_size, const casync_overflow_policy overflow_policy);
-        void cspdlog_set_async_mode(size_t q_size);
-        void cspdlog_drop_all(void);
+		bool cspd_set_async_mode(size_t queue_size, const casync_overflow_policy overflow_policy);
+        void cspd_drop_all(void);
 	
 
 #ifdef __cplusplus
