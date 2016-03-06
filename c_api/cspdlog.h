@@ -40,8 +40,8 @@ extern "C" {
 	bool cspd_set_async_mode(size_t queue_size, const casync_overflow_policy overflow_policy);
 	
 	//logging
-	void clog_info(clogger* c, const char * std, ... );
-	void clog_debug(clogger* c, const char * std, ... );
+	void clog_info(clogger* c, const char * std, ... ) __attribute__ ((format (printf, 2, 3)));
+	void clog_debug(clogger* c, const char * std, ... )  __attribute__ ((format (printf, 2, 3)));
         void cspd_drop_all(void);
 	
 	//configuring logger	
