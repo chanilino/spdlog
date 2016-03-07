@@ -30,10 +30,12 @@ set(CMAKE_CXX_FLAGS "--std=c++11 ${CMAKE_C_FLAGS}")
 
 add_executable(tests testcspdlog.c)
 add_executable(cspdlog-bench spdlog-bench.c)
+add_executable(example example.c)
 include_directories( "./c_api" )
 add_subdirectory( "./c_api" )
 #find_library(CSPDLOG NAMES cspdlog PATH "c_api/build" )
 
 target_link_libraries(tests  cspdlog)
 target_link_libraries(cspdlog-bench  cspdlog)
+target_link_libraries(example  cspdlog)
 #file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/logs")
