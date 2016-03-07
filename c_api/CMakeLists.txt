@@ -26,7 +26,7 @@ project(CSpdlogAPi)
 
 
 if (CMAKE_COMPILER_IS_GNUCXX)
-  set ( CMAKE_CXX_FLAGS "-Wall --std=c++11 -pthread -O3")  
+  set ( CMAKE_CXX_FLAGS "-g -Wall --std=c++11 -pthread -O3")  
   set ( CMAKE_EXE_LINKER_FLAGS "-pthread")  
 endif ()
 

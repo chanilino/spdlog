@@ -24,7 +24,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(CSpdlogAPITests)
 
-set(CMAKE_C_FLAGS "-Wall -O3 -pthread")
+set(CMAKE_C_FLAGS "-g -Wall -O3 -pthread")
 
 set(CMAKE_CXX_FLAGS "--std=c++11 ${CMAKE_C_FLAGS}")  
 

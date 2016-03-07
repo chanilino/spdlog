@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-typedef struct _clogger clogger;
+typedef void clogger;
 typedef enum {
   TRACE = 0,
   DEBUG = 1,

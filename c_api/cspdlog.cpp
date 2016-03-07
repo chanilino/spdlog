@@ -6,112 +6,61 @@
 #include "spdlog/spdlog.h"
 #include "cspdlog.h"
 
-struct _clogger {
-  std::shared_ptr<spdlog::logger> logger;
-};
 extern "C" {
-static inline clogger *alloc_clogger(void) {
-  clogger *c = (clogger *)calloc(1, sizeof(*c));
-  return c;
-}
 
 clogger *cspd_get(const char *name) {
-  clogger *c = alloc_clogger();
-  if (c != NULL) {
-    c->logger = spdlog::get(name);
-  }
-  return c;
+    return spdlog::get(name).get();
 }
 
 clogger *cspd_stdout_logger_mt(const char *name) {
-  clogger *c = alloc_clogger();
-  if (c != NULL) {
-    c->logger = spdlog::stdout_logger_mt(name);
-  }
-  return c;
+   return  spdlog::stdout_logger_mt(name).get();
 }
 
 clogger *cspd_stdout_logger_st(const char *name) {
-  clogger *c = alloc_clogger();
-  if (c != NULL) {
-    c->logger = spdlog::stdout_logger_st(name);
-  }
-  return c;
+    return spdlog::stdout_logger_st(name).get();
 }
 
 clogger *cspd_stderr_logger_mt(const char *name) {
-  clogger *c = alloc_clogger();
-  if (c != NULL) {
-    c->logger = spdlog::stderr_logger_mt(name);
-  }
-  return c;
+    return  spdlog::stderr_logger_mt(name).get();
 }
 
 clogger *cspd_stderr_logger_st(const char *name) {
-  clogger *c = alloc_clogger();
-  if (c != NULL) {
-    c->logger = spdlog::stderr_logger_st(name);
-  }
-  return c;
+    return spdlog::stderr_logger_st(name).get();
 }
 
 clogger *cspd_rotating_logger_mt(const char *logger_name, const char *filename,
                                  size_t max_file_size, size_t max_files,
                                  bool force_flush) {
-  clogger *c = alloc_clogger();
-  if (c != NULL) {
-    c->logger = spdlog::rotating_logger_mt(logger_name, filename, max_file_size,
-                                           force_flush);
-  }
-  return c;
+    return spdlog::rotating_logger_mt(logger_name, filename, max_file_size,
+                                           force_flush).get();
 }
 clogger *cspd_rotating_logger_st(const char *logger_name, const char *filename,
                                  size_t max_file_size, size_t max_files,
                                  bool force_flush) {
-  clogger *c = alloc_clogger();
-  if (c != NULL) {
-    c->logger = spdlog::rotating_logger_mt(logger_name, filename, max_file_size,
-                                           force_flush);
-  }
-  return c;
+    return spdlog::rotating_logger_mt(logger_name, filename, max_file_size,
+                                           force_flush).get();
 }
 clogger *cspd_daily_logger_mt(const char *logger_name, const char *filename,
                               int hour, int minute, bool force_flush) {
-  clogger *c = alloc_clogger();
-  if (c != NULL) {
-    c->logger = spdlog::daily_logger_mt(logger_name, filename, hour, minute,
-                                        force_flush);
-  }
-  return c;
+    return spdlog::daily_logger_mt(logger_name, filename, hour, minute,
+                                        force_flush).get();
 }
 clogger *cspd_daily_logger_st(const char *logger_name, const char *filename,
                               int hour, int minute, bool force_flush) {
-  clogger *c = alloc_clogger();
-  if (c != NULL) {
-    c->logger = spdlog::daily_logger_mt(logger_name, filename, hour, minute,
-                                        force_flush);
-  }
-  return c;
+    return spdlog::daily_logger_mt(logger_name, filename, hour, minute,
+                                        force_flush).get();
 }
 
 clogger *cspd_simple_file_logger_st(const char *name, const char *file,
                                     bool force_flush) {
-  clogger *c = alloc_clogger();
-  if (c != NULL) {
-    c->logger = spdlog::create<spdlog::sinks::simple_file_sink_st>(name, file,
-                                                                   force_flush);
-  }
-  return c;
+    return spdlog::create<spdlog::sinks::simple_file_sink_st>(name, file,
+                                                                   force_flush).get();
 }
 
 #if defined(__linux__) || defined(__APPLE__)
 clogger *cspd_syslog_logger(const char *logger_name, const char *ident,
                             int syslog_option) {
-  clogger *c = alloc_clogger();
-  if (c != NULL) {
-    c->logger = spdlog::syslog_logger(logger_name, ident, syslog_option);
-  }
-  return c;
+    return spdlog::syslog_logger(logger_name, ident, syslog_option).get();
 }
 #endif
 
@@ -187,24 +136,29 @@ bool cspd_set_async_mode(size_t queue_size,
 void cspd_set_sync_mode(void) { spdlog::set_sync_mode(); }
 
 // by instance
-void cspd_logger_set_pattern(clogger *c, const char *pattern) {
-  c->logger->set_pattern(pattern);
+void cspd_logger_set_pattern(clogger *clog, const char *pattern) {
+  spdlog::logger* c= (spdlog::logger*) clog;
+  c->set_pattern(pattern);
 }
 
-bool cspd_logger_set_level(clogger *c, clevel_enum level) {
+bool cspd_logger_set_level(clogger *clog, clevel_enum level) {
+  spdlog::logger* c= (spdlog::logger*) clog;
   spdlog::level::level_enum level_spd;
   bool converted = cspd_convert_level(level, level_spd);
   if (converted) {
-    c->logger->set_level(level_spd);
+    c->set_level(level_spd);
   }
   return converted;
 }
 
-void cspd_logger_flush(clogger *c) { c->logger->flush(); }
+void cspd_logger_flush(clogger *clog) {
+  spdlog::logger* c= (spdlog::logger*) clog;
+       	c->flush(); 
+}
 
 // TODO: check performance retuning bool
 static inline void cspd_printf(char **msg,
-                               std::shared_ptr<spdlog::logger> logger,
+                               spdlog::logger* logger,
                                spdlog::level::level_enum level, const char *std,
                                va_list args) {
   *msg = NULL;
@@ -217,102 +171,112 @@ static inline void cspd_printf(char **msg,
   }
 }
 
-void cspd_trace(clogger *c, const char *std, ...) {
+void cspd_trace(clogger *clog, const char *std, ...) {
+  spdlog::logger* c= (spdlog::logger*) clog;
   va_list args;
   char *msg;
   va_start(args, std);
-  cspd_printf(&msg, c->logger, spdlog::level::info, std, args);
+  cspd_printf(&msg, c, spdlog::level::info, std, args);
   va_end(args);
   if (msg) {
-    c->logger->trace() << msg;
+    c->trace() << msg;
     free(msg);
   }
 }
-void cspd_debug(clogger *c, const char *std, ...) {
+void cspd_debug(clogger *clog, const char *std, ...) {
+  spdlog::logger* c= (spdlog::logger*) clog;
   va_list args;
   char *msg;
   va_start(args, std);
-  cspd_printf(&msg, c->logger, spdlog::level::info, std, args);
+  cspd_printf(&msg, c, spdlog::level::info, std, args);
   va_end(args);
   if (msg) {
-    c->logger->debug() << msg;
+    c->debug() << msg;
     free(msg);
   }
 }
-void cspd_info(clogger *c, const char *std, ...) {
+void cspd_info(clogger *clog, const char *std, ...) {
+  spdlog::logger* c= (spdlog::logger*) clog;
   va_list args;
   char *msg;
   va_start(args, std);
-  cspd_printf(&msg, c->logger, spdlog::level::info, std, args);
+  cspd_printf(&msg, c, spdlog::level::info, std, args);
   va_end(args);
   if (msg) {
-    c->logger->info() << msg;
+    c->info() << msg;
     free(msg);
   }
 }
-void cspd_notice(clogger *c, const char *std, ...) {
+
+void cspd_notice(clogger *clog, const char *std, ...) {
+  spdlog::logger* c= (spdlog::logger*) clog;
   va_list args;
   char *msg;
   va_start(args, std);
-  cspd_printf(&msg, c->logger, spdlog::level::notice, std, args);
+  cspd_printf(&msg, c, spdlog::level::notice, std, args);
   va_end(args);
   if (msg) {
-    c->logger->notice() << msg;
+    c->notice() << msg;
     free(msg);
   }
 }
-void cspd_warn(clogger *c, const char *std, ...) {
+void cspd_warn(clogger *clog, const char *std, ...) {
+  spdlog::logger* c= (spdlog::logger*) clog;
   va_list args;
   char *msg;
   va_start(args, std);
-  cspd_printf(&msg, c->logger, spdlog::level::warn, std, args);
+  cspd_printf(&msg, c, spdlog::level::warn, std, args);
   va_end(args);
   if (msg) {
-    c->logger->warn() << msg;
+    c->warn() << msg;
     free(msg);
   }
 }
-void cspd_error(clogger *c, const char *std, ...) {
+void cspd_error(clogger *clog, const char *std, ...) {
+  spdlog::logger* c= (spdlog::logger*) clog;
   va_list args;
   char *msg;
   va_start(args, std);
-  cspd_printf(&msg, c->logger, spdlog::level::err, std, args);
+  cspd_printf(&msg, c, spdlog::level::err, std, args);
   va_end(args);
   if (msg) {
-    c->logger->error() << msg;
+    c->error() << msg;
     free(msg);
   }
 }
-void cspd_critical(clogger *c, const char *std, ...) {
+void cspd_critical(clogger *clog, const char *std, ...) {
+  spdlog::logger* c= (spdlog::logger*) clog;
   va_list args;
   char *msg;
   va_start(args, std);
-  cspd_printf(&msg, c->logger, spdlog::level::critical, std, args);
+  cspd_printf(&msg, c, spdlog::level::critical, std, args);
   va_end(args);
   if (msg) {
-    c->logger->critical() << msg;
+    c->critical() << msg;
     free(msg);
   }
 }
-void cspd_alert(clogger *c, const char *std, ...) {
+void cspd_alert(clogger *clog, const char *std, ...) {
+  spdlog::logger* c= (spdlog::logger*) clog;
   va_list args;
   char *msg;
   va_start(args, std);
-  cspd_printf(&msg, c->logger, spdlog::level::alert, std, args);
+  cspd_printf(&msg, c, spdlog::level::alert, std, args);
   va_end(args);
   if (msg) {
-    c->logger->alert() << msg;
+    c->alert() << msg;
     free(msg);
   }
 }
-void cspd_emerg(clogger *c, const char *std, ...) {
+void cspd_emerg(clogger *clog, const char *std, ...) {
+  spdlog::logger* c= (spdlog::logger*) clog;
   va_list args;
   char *msg;
   va_start(args, std);
-  cspd_printf(&msg, c->logger, spdlog::level::emerg, std, args);
+  cspd_printf(&msg, c, spdlog::level::emerg, std, args);
   va_end(args);
   if (msg) {
-    c->logger->emerg() << msg;
+    c->emerg() << msg;
     free(msg);
   }
 }
