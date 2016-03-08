@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 typedef void clogger;
+typedef void csink;
 typedef enum {
   TRACE = 0,
   DEBUG = 1,
@@ -53,6 +54,12 @@ clogger *cspd_syslog_logger(const char *logger_name, const char *ident,
                             int syslog_option);
 #endif
 
+clogger *cpsd_create_logger_with_sink(const char* logger_name, csink * sink);
+
+// Create sinks
+csink *cspd_rotating_file_sink_mt( const char *filename, const char* extension,
+		size_t max_file_size, size_t max_files,
+		bool force_flush);
 // Global functions
 void cspd_set_pattern(const char *pattern);
 bool cspd_set_level(clevel_enum level);
@@ -85,6 +92,8 @@ void cspd_alert(clogger *c, const char *std, ...)
 void cspd_emerg(clogger *c, const char *std, ...)
     __attribute__((format(printf, 2, 3)));
 
+
+void cspd_logger_drop(const char* name);
 void cspd_drop_all(void);
 
 #ifdef __cplusplus

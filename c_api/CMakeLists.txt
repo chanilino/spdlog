@@ -26,16 +26,29 @@ project(CSpdlogAPi)
 
 
 if (CMAKE_COMPILER_IS_GNUCXX)
-  set ( CMAKE_CXX_FLAGS "-g -Wall --std=c++11 -pthread -O3")  
+  set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --std=c++11 -pthread -O3 ")  
   set ( CMAKE_EXE_LINKER_FLAGS "-pthread")  
 endif ()
 
 #add_executable(example example.cpp)
-#add_library(cspdlog STATIC cspdlog.cpp)
-add_library(cspdlog SHARED cspdlog.cpp)
+add_library(cspdlog_obj OBJECT cspdlog.cpp)
+
+set_property(TARGET cspdlog_obj PROPERTY POSITION_INDEPENDENT_CODE 1)
+
+add_library(cspdlog_shared SHARED $<TARGET_OBJECTS:cspdlog_obj>)
+add_library(cspdlog_static STATIC $<TARGET_OBJECTS:cspdlog_obj>)
+set_target_properties(cspdlog_shared PROPERTIES OUTPUT_NAME cspdlog CLEAN_DIRECT_OUTPUT 1)
+set_target_properties(cspdlog_static PROPERTIES OUTPUT_NAME cspdlog CLEAN_DIRECT_OUTPUT 1)
 
 #target_link_libraries(example )
 include_directories("../include")
-target_link_libraries(cspdlog stdc++)
+target_link_libraries(cspdlog_shared stdc++)
+target_link_libraries(cspdlog_static stdc++)
 
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/logs")
+install(TARGETS cspdlog_shared cspdlog_static 
+		LIBRARY DESTINATION "lib"
+		ARCHIVE DESTINATION "lib"
+)
+install(FILES cspdlog.h DESTINATION "include")
+

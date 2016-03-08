@@ -73,6 +73,15 @@ int main(int argc, char *argv[]) {
   for (i = 0; i < 100; ++i)
     cspd_info(async_file, "Async message #%d", i);
 
+  csink * sink_rotate = cspd_rotating_file_sink_mt("logs/async_sink", "txt", 1024*16, 2, false);
+  clogger * log1 = cpsd_create_logger_with_sink("log1", sink_rotate);
+  clogger * log2 = cpsd_create_logger_with_sink("log2", sink_rotate);
+  for (i = 0; i < 100; ++i){
+    	cspd_info(log1, "Async message #%d", i);
+    	cspd_info(log2, "Async message #%d", i);
+  		cspd_info(get_console, "Async message #%d", i);
+  }
+
 //
 // syslog example. linux only..
 //

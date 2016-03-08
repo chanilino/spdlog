@@ -5,6 +5,8 @@
 
 #include "spdlog/spdlog.h"
 #include "cspdlog.h"
+    
+static std::unordered_map <void*, std::shared_ptr<spdlog::sinks::sink>> _sinks;
 
 extern "C" {
 
@@ -63,6 +65,25 @@ clogger *cspd_syslog_logger(const char *logger_name, const char *ident,
     return spdlog::syslog_logger(logger_name, ident, syslog_option).get();
 }
 #endif
+clogger *cpsd_create_logger_with_sink(const char* logger_name, csink * sink){
+    auto found = _sinks.find(sink);
+    auto _sink = found == _sinks.end() ? nullptr : found->second;
+	assert(_sink != nullptr);
+	auto logger  = std::make_shared<spdlog::logger>(logger_name, _sink);
+	spdlog::register_logger(logger);
+	return logger.get();
+}
+
+//We need support of hidden logger to maintain csink out
+
+//Sinks
+csink *cspd_rotating_file_sink_mt( const char *filename, const char* extension,
+		size_t max_file_size, size_t max_files,
+		bool force_flush){
+	auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filename,extension, max_file_size ,max_files,force_flush);
+	_sinks[sink.get()] = sink;
+	return sink.get();
+}
 
 static inline bool cspd_convert_level(clevel_enum level,
                                       spdlog::level::level_enum &level_spd) {
@@ -154,6 +175,9 @@ bool cspd_logger_set_level(clogger *clog, clevel_enum level) {
 void cspd_logger_flush(clogger *clog) {
   spdlog::logger* c= (spdlog::logger*) clog;
        	c->flush(); 
+}
+void cspd_logger_drop(const char* name){
+	spdlog::drop(name);
 }
 
 // TODO: check performance retuning bool
@@ -284,5 +308,6 @@ void cspd_emerg(clogger *clog, const char *std, ...) {
 void cspd_drop_all(void) {
   // TODO: think about how to free memory allocated in cspd
   spdlog::drop_all();
+  _sinks.clear();
 }
 }
