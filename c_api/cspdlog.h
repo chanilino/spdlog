@@ -2,20 +2,21 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdarg.h>
 
 typedef void clogger;
 typedef void csink;
 typedef enum {
-  TRACE = 0,
-  DEBUG = 1,
-  INFO = 2,
-  NOTICE = 3,
-  WARN = 4,
-  ERR = 5,
-  CRITICAL = 6,
-  ALERT = 7,
-  EMERG = 8,
-  OFF = 9
+  CSPD_TRACE = 0,
+  CSPD_DEBUG = 1,
+  CSPD_INFO = 2,
+  CSPD_NOTICE = 3,
+  CSPD_WARN = 4,
+  CSPD_ERR = 5,
+  CSPD_CRITICAL = 6,
+  CSPD_ALERT = 7,
+  CSPD_EMERG = 8,
+  CSPD_OFF = 9
 } clevel_enum;
 
 typedef enum {
@@ -91,6 +92,8 @@ void cspd_alert(clogger *c, const char *std, ...)
     __attribute__((format(printf, 2, 3)));
 void cspd_emerg(clogger *c, const char *std, ...)
     __attribute__((format(printf, 2, 3)));
+
+void cspd_info_(clogger *c, const char *std, va_list va);
 
 
 void cspd_logger_drop(const char* name);

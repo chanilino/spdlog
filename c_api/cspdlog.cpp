@@ -89,34 +89,34 @@ static inline bool cspd_convert_level(clevel_enum level,
                                       spdlog::level::level_enum &level_spd) {
   level_spd = spdlog::level::off;
   switch (level) {
-  case TRACE:
+  case CSPD_TRACE:
     level_spd = spdlog::level::trace;
     break;
-  case DEBUG:
+  case CSPD_DEBUG:
     level_spd = spdlog::level::debug;
     break;
-  case INFO:
+  case CSPD_INFO:
     level_spd = spdlog::level::info;
     break;
-  case NOTICE:
+  case CSPD_NOTICE:
     level_spd = spdlog::level::notice;
     break;
-  case WARN:
+  case CSPD_WARN:
     level_spd = spdlog::level::warn;
     break;
-  case ERR:
+  case CSPD_ERR:
     level_spd = spdlog::level::err;
     break;
-  case CRITICAL:
+  case CSPD_CRITICAL:
     level_spd = spdlog::level::critical;
     break;
-  case ALERT:
+  case CSPD_ALERT:
     level_spd = spdlog::level::alert;
     break;
-  case EMERG:
+  case CSPD_EMERG:
     level_spd = spdlog::level::emerg;
     break;
-  case OFF:
+  case CSPD_OFF:
     level_spd = spdlog::level::off;
     break;
 
@@ -219,17 +219,21 @@ void cspd_debug(clogger *clog, const char *std, ...) {
     free(msg);
   }
 }
-void cspd_info(clogger *clog, const char *std, ...) {
+void cspd_info_(clogger *clog, const char *std, va_list va){
   spdlog::logger* c= (spdlog::logger*) clog;
-  va_list args;
   char *msg;
-  va_start(args, std);
-  cspd_printf(&msg, c, spdlog::level::info, std, args);
-  va_end(args);
+  cspd_printf(&msg, c, spdlog::level::notice, std, va);
   if (msg) {
     c->info() << msg;
     free(msg);
   }
+
+}
+void cspd_info(clogger *clog, const char *std, ...) {
+  va_list args;
+  va_start(args, std);
+  cspd_info_(clog, std, args);
+  va_end(args);
 }
 
 void cspd_notice(clogger *clog, const char *std, ...) {

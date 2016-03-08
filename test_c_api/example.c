@@ -20,9 +20,9 @@ int main(int argc, char *argv[]) {
   //
   // Runtime log levels
   //
-  cspd_set_level(INFO); // Set global log level to info
+  cspd_set_level(CSPD_INFO); // Set global log level to info
   cspd_debug(console, "This message shold not be displayed!");
-  cspd_logger_set_level(console, DEBUG); // Set specific logger's log level
+  cspd_logger_set_level(console, CSPD_DEBUG); // Set specific logger's log level
   cspd_debug(console, "Now it should..");
 
   //
@@ -54,11 +54,11 @@ int main(int argc, char *argv[]) {
                          "using the cspd_get(logger_name) function");
   //
   // Compile time debug or trace macros.
-  // Enabled #ifdef SPDLOG_DEBUG_ON or #ifdef SPDLOG_TRACE_ON
+  // Enabled #ifdef SPDLOG_CSPD_DEBUG_ON or #ifdef SPDLOG_CSPD_TRACE_ON
   //
-  // SPDLOG_TRACE(console, "Enabled only #ifdef SPDLOG_TRACE_ON..{} ,{}", 1,
+  // SPDLOG_CSPD_TRACE(console, "Enabled only #ifdef SPDLOG_CSPD_TRACE_ON..{} ,{}", 1,
   // 3.23);
-  // SPDLOG_DEBUG(console, "Enabled only #ifdef SPDLOG_DEBUG_ON.. {} ,{}", 1,
+  // SPDLOG_CSPD_DEBUG(console, "Enabled only #ifdef SPDLOG_CSPD_DEBUG_ON.. {} ,{}", 1,
   // 3.23);
 
   //
