@@ -56,6 +56,7 @@ clogger *cspd_syslog_logger(const char *logger_name, const char *ident,
 #endif
 
 clogger *cpsd_create_logger_with_sink(const char* logger_name, csink * sink);
+clogger *cpsd_create_logger_with_sinks(const char* logger_name, ...);
 
 // Create sinks
 csink *cspd_rotating_file_sink_mt( const char *filename, const char* extension,

@@ -74,6 +74,20 @@ clogger *cpsd_create_logger_with_sink(const char* logger_name, csink * sink){
 	return logger.get();
 }
 
+clogger *cpsd_create_logger_with_sinks(const char* logger_name, ...){
+//TODO: see tuple cat
+	//	va_list args;\
+//  	va_start(args, logger_name);
+//	auto t;
+//	int i = 3;
+//	std::tuple<spdlog::sinks::sink> t0(sink);
+//	t = t0;
+//	for(i; i < 3; i++){
+//		auto t =  at(t, ti);
+//	}
+//	va_end(args);
+}
+
 //We need support of hidden logger to maintain csink out
 
 //Sinks
