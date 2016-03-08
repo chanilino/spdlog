@@ -74,26 +74,34 @@ bool cspd_logger_set_level(clogger *c, clevel_enum level);
 void cspd_logger_flush(clogger *c);
 
 // logging
-void cspd_trace(clogger *c, const char *std, ...)
-    __attribute__((format(printf, 2, 3)));
-void cspd_debug(clogger *c, const char *std, ...)
-    __attribute__((format(printf, 2, 3)));
-void cspd_info(clogger *c, const char *std, ...)
-    __attribute__((format(printf, 2, 3)));
-void cspd_notice(clogger *c, const char *std, ...)
-    __attribute__((format(printf, 2, 3)));
-void cspd_warn(clogger *c, const char *std, ...)
-    __attribute__((format(printf, 2, 3)));
-void cspd_error(clogger *c, const char *std, ...)
-    __attribute__((format(printf, 2, 3)));
-void cspd_critical(clogger *c, const char *std, ...)
-    __attribute__((format(printf, 2, 3)));
-void cspd_alert(clogger *c, const char *std, ...)
-    __attribute__((format(printf, 2, 3)));
-void cspd_emerg(clogger *c, const char *std, ...)
-    __attribute__((format(printf, 2, 3)));
-
+void cspd_trace_(clogger *c, const char *std, va_list va);
+void cspd_debug_(clogger *c, const char *std, va_list va);
 void cspd_info_(clogger *c, const char *std, va_list va);
+void cspd_notice_(clogger *c, const char *std, va_list va);
+void cspd_warn_(clogger *c, const char *std, va_list va);
+void cspd_error_(clogger *c, const char *std, va_list va);
+void cspd_critical_(clogger *c, const char *std, va_list va);
+void cspd_alert_(clogger *c, const char *std, va_list va);
+void cspd_emerg_(clogger *c, const char *std, va_list va);
+
+
+
+#define LOG_VA_BODY( level ) 	va_list args;\
+  va_start(args, std);\
+  cspd_ ## level ## _(c, std, args);\
+  va_end(args);
+
+static inline void cspd_trace(clogger *c, const char *std, ...){LOG_VA_BODY(trace);}
+static inline void cspd_debug(clogger *c, const char *std, ...){LOG_VA_BODY(debug);}
+static inline void cspd_info(clogger *c, const char *std, ...){LOG_VA_BODY(info);}
+static inline void cspd_notice(clogger *c, const char *std, ...){LOG_VA_BODY(notice);}
+static inline void cspd_warn(clogger *c, const char *std, ...){LOG_VA_BODY(warn);}
+static inline void cspd_error(clogger *c, const char *std, ...){LOG_VA_BODY(error);}
+static inline void cspd_critical(clogger *c, const char *std, ...){LOG_VA_BODY(critical);}
+static inline void cspd_alert(clogger *c, const char *std, ...){LOG_VA_BODY(alert);}
+static inline void cspd_emerg(clogger *c, const char *std, ...){LOG_VA_BODY(emerg);}
+
+
 
 
 void cspd_logger_drop(const char* name);

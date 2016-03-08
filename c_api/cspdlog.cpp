@@ -180,134 +180,55 @@ void cspd_logger_drop(const char* name){
 	spdlog::drop(name);
 }
 
-// TODO: check performance retuning bool
-static inline void cspd_printf(char **msg,
-                               spdlog::logger* logger,
-                               spdlog::level::level_enum level, const char *std,
-                               va_list args) {
-  *msg = NULL;
-  if (!logger->should_log(level)) {
-    return;
-  }
-  int n = vasprintf(msg, std, args);
-  if (n < 0) {
-    *msg = NULL;
-  }
+
+#define BODY_CSPD_LEVEL_2(func_level,level_log)	spdlog::logger* logger= (spdlog::logger*)clog;\
+	char *msg;\
+	if (!logger->should_log( spdlog::level:: level_log)){ return; }\
+	int n = vasprintf(&msg, std, va);\
+	if (n < 0){ return; }\
+    	logger->func_level() << msg;\
+	free(msg)
+	
+		
+#define BODY_CSPD_LEVEL_(level_log) BODY_CSPD_LEVEL_2(level_log, level_log)
+
+void cspd_trace_(clogger *clog, const char *std, va_list va){
+	BODY_CSPD_LEVEL_(trace);
 }
 
-void cspd_trace(clogger *clog, const char *std, ...) {
-  spdlog::logger* c= (spdlog::logger*) clog;
-  va_list args;
-  char *msg;
-  va_start(args, std);
-  cspd_printf(&msg, c, spdlog::level::info, std, args);
-  va_end(args);
-  if (msg) {
-    c->trace() << msg;
-    free(msg);
-  }
+void cspd_debug_(clogger *clog, const char *std, va_list va){
+	BODY_CSPD_LEVEL_(debug);
 }
-void cspd_debug(clogger *clog, const char *std, ...) {
-  spdlog::logger* c= (spdlog::logger*) clog;
-  va_list args;
-  char *msg;
-  va_start(args, std);
-  cspd_printf(&msg, c, spdlog::level::info, std, args);
-  va_end(args);
-  if (msg) {
-    c->debug() << msg;
-    free(msg);
-  }
-}
+
 void cspd_info_(clogger *clog, const char *std, va_list va){
-  spdlog::logger* c= (spdlog::logger*) clog;
-  char *msg;
-  cspd_printf(&msg, c, spdlog::level::notice, std, va);
-  if (msg) {
-    c->info() << msg;
-    free(msg);
-  }
-
-}
-void cspd_info(clogger *clog, const char *std, ...) {
-  va_list args;
-  va_start(args, std);
-  cspd_info_(clog, std, args);
-  va_end(args);
+	BODY_CSPD_LEVEL_(info);
 }
 
-void cspd_notice(clogger *clog, const char *std, ...) {
-  spdlog::logger* c= (spdlog::logger*) clog;
-  va_list args;
-  char *msg;
-  va_start(args, std);
-  cspd_printf(&msg, c, spdlog::level::notice, std, args);
-  va_end(args);
-  if (msg) {
-    c->notice() << msg;
-    free(msg);
-  }
+void cspd_notice_(clogger *clog, const char *std, va_list va){
+	BODY_CSPD_LEVEL_(notice);
 }
-void cspd_warn(clogger *clog, const char *std, ...) {
-  spdlog::logger* c= (spdlog::logger*) clog;
-  va_list args;
-  char *msg;
-  va_start(args, std);
-  cspd_printf(&msg, c, spdlog::level::warn, std, args);
-  va_end(args);
-  if (msg) {
-    c->warn() << msg;
-    free(msg);
-  }
+
+void cspd_warn_(clogger *clog, const char *std, va_list va){
+	BODY_CSPD_LEVEL_(warn);
 }
-void cspd_error(clogger *clog, const char *std, ...) {
-  spdlog::logger* c= (spdlog::logger*) clog;
-  va_list args;
-  char *msg;
-  va_start(args, std);
-  cspd_printf(&msg, c, spdlog::level::err, std, args);
-  va_end(args);
-  if (msg) {
-    c->error() << msg;
-    free(msg);
-  }
+
+void cspd_error_(clogger *clog, const char *std, va_list va){
+	BODY_CSPD_LEVEL_2(error, err);
 }
-void cspd_critical(clogger *clog, const char *std, ...) {
-  spdlog::logger* c= (spdlog::logger*) clog;
-  va_list args;
-  char *msg;
-  va_start(args, std);
-  cspd_printf(&msg, c, spdlog::level::critical, std, args);
-  va_end(args);
-  if (msg) {
-    c->critical() << msg;
-    free(msg);
-  }
+
+void cspd_critical_(clogger *clog, const char *std, va_list va){
+	BODY_CSPD_LEVEL_(critical);
 }
-void cspd_alert(clogger *clog, const char *std, ...) {
-  spdlog::logger* c= (spdlog::logger*) clog;
-  va_list args;
-  char *msg;
-  va_start(args, std);
-  cspd_printf(&msg, c, spdlog::level::alert, std, args);
-  va_end(args);
-  if (msg) {
-    c->alert() << msg;
-    free(msg);
-  }
+
+void cspd_alert_(clogger *clog, const char *std, va_list va){
+	BODY_CSPD_LEVEL_(alert);
 }
-void cspd_emerg(clogger *clog, const char *std, ...) {
-  spdlog::logger* c= (spdlog::logger*) clog;
-  va_list args;
-  char *msg;
-  va_start(args, std);
-  cspd_printf(&msg, c, spdlog::level::emerg, std, args);
-  va_end(args);
-  if (msg) {
-    c->emerg() << msg;
-    free(msg);
-  }
+
+void cspd_emerg_(clogger *clog, const char *std, va_list va){
+	BODY_CSPD_LEVEL_(emerg);
 }
+
+
 
 void cspd_drop_all(void) {
   // TODO: think about how to free memory allocated in cspd
