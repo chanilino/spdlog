@@ -5,6 +5,9 @@
 //
 // spdlog usage example
 //
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 #ifdef __linux__
 #include <syslog.h>
 #endif

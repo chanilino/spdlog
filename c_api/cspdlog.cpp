@@ -1,6 +1,7 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
+#include <stdlib.h>
 #include <stdio.h>
 
 #include "spdlog/spdlog.h"
@@ -76,7 +77,7 @@ clogger *cpsd_create_logger_with_sink(const char* logger_name, csink * sink){
 
 clogger *cpsd_create_logger_with_sinks(const char* logger_name, ...){
 //TODO: see tuple cat
-	//	va_list args;\
+	//	va_list args;
 //  	va_start(args, logger_name);
 //	auto t;
 //	int i = 3;
@@ -86,6 +87,7 @@ clogger *cpsd_create_logger_with_sinks(const char* logger_name, ...){
 //		auto t =  at(t, ti);
 //	}
 //	va_end(args);
+	return NULL;
 }
 
 //We need support of hidden logger to maintain csink out
@@ -194,52 +196,49 @@ void cspd_logger_drop(const char* name){
 	spdlog::drop(name);
 }
 
-
-#define BODY_CSPD_LEVEL_2(func_level,level_log)	spdlog::logger* logger= (spdlog::logger*)clog;\
-	char *msg;\
-	if (!logger->should_log( spdlog::level:: level_log)){ return; }\
-	int n = vasprintf(&msg, std, va);\
-	if (n < 0){ return; }\
-    	logger->func_level() << msg;\
-	free(msg)
-	
-		
-#define BODY_CSPD_LEVEL_(level_log) BODY_CSPD_LEVEL_2(level_log, level_log)
-
-void cspd_trace_(clogger *clog, const char *std, va_list va){
-	BODY_CSPD_LEVEL_(trace);
+bool cspd_logger_should_log(clogger* c, clevel_enum level){
+	spdlog::logger* logger= (spdlog::logger*)c;
+  	spdlog::level::level_enum level_spd;
+	if(!cspd_convert_level(level, level_spd)){
+		return false;
+	}
+	return logger->should_log(level_spd);
 }
 
-void cspd_debug_(clogger *clog, const char *std, va_list va){
-	BODY_CSPD_LEVEL_(debug);
+void _cspd_trace(clogger *c, const char *msg){
+	((spdlog::logger*)c)->trace() << msg;
 }
 
-void cspd_info_(clogger *clog, const char *std, va_list va){
-	BODY_CSPD_LEVEL_(info);
+void _cspd_debug(clogger *c, const char *msg){
+	((spdlog::logger*)c)->debug() << msg;
 }
 
-void cspd_notice_(clogger *clog, const char *std, va_list va){
-	BODY_CSPD_LEVEL_(notice);
+void _cspd_info(clogger* c, const char* msg){
+	((spdlog::logger*)c)->info() << msg;
 }
 
-void cspd_warn_(clogger *clog, const char *std, va_list va){
-	BODY_CSPD_LEVEL_(warn);
+void _cspd_notice(clogger *c, const char *msg){
+	((spdlog::logger*)c)->notice() << msg;
 }
 
-void cspd_error_(clogger *clog, const char *std, va_list va){
-	BODY_CSPD_LEVEL_2(error, err);
+void _cspd_warn(clogger *c, const char *msg){
+	((spdlog::logger*)c)->warn() << msg;
 }
 
-void cspd_critical_(clogger *clog, const char *std, va_list va){
-	BODY_CSPD_LEVEL_(critical);
+void _cspd_error(clogger *c, const char *msg){
+	((spdlog::logger*)c)->error() << msg;
 }
 
-void cspd_alert_(clogger *clog, const char *std, va_list va){
-	BODY_CSPD_LEVEL_(alert);
+void _cspd_critical(clogger *c, const char *msg){
+	((spdlog::logger*)c)->critical() << msg;
 }
 
-void cspd_emerg_(clogger *clog, const char *std, va_list va){
-	BODY_CSPD_LEVEL_(emerg);
+void _cspd_alert(clogger *c, const char *msg){
+	((spdlog::logger*)c)->alert() << msg;
+}
+
+void _cspd_emerg(clogger *c, const char *msg){
+	((spdlog::logger*)c)->emerg() << msg;
 }
 
 
